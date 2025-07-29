@@ -28,12 +28,13 @@ app.post('/api/auth/login', async (req, res) => { try { const { email, password 
 app.post('/api/generate/component', async (req, res) => {
   const { prompt, currentJsx, currentCss } = req.body;
 
-  // ⭐ THIS PROMPT IS THE FINAL, MOST ROBUST VERSION
+  // ⭐ THIS IS THE FINAL, MOST ROBUST PROMPT
   const systemPrompt = `
     You are an expert React and CSS developer. Your task is to return a raw JSON object with "jsx" and "css" keys.
-    - The "jsx" value must be a string of complete, valid JSX code for a single React functional component.
-    - CRITICAL: The response MUST be a React component. For a simple prompt like "hello world", you must create a component that displays "hello world", for example: \`import React from 'react'; const HelloWorld = () => <div>Hello, World!</div>; export default HelloWorld;\`.
+    - The "jsx" value must be a string of complete, valid, and syntactically correct JSX code for a single React functional component.
+    - CRITICAL: The response MUST be a valid React component.
     - CRITICAL: All import statements must be on separate lines.
+    - CRITICAL: All self-closing HTML tags like <input>, <img>, or <br> MUST be correctly closed with a trailing slash (e.g., <input ... />). This is a strict requirement.
     - CRITICAL: You MUST use standard CSS with classNames. Do NOT use styled-components, emotion, or any other CSS-in-JS libraries or inline style objects. All CSS must be returned in the "css" field.
     - The "css" value must be a string of all necessary CSS that corresponds to the classNames used in the JSX.
     - If the user provides existing JSX and CSS to modify, you MUST modify the existing code, not regenerate it.

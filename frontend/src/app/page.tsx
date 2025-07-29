@@ -25,7 +25,8 @@ export default function Home() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  // ⭐ FIX: This line removes any trailing slash from the URL to prevent 404 errors.
+  const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
   const fetchSessions = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -60,7 +61,6 @@ export default function Home() {
 
   const handleSendMessage = async (prompt: string) => {
     setIsLoading(true);
-    // ⭐ FIX: Explicitly type the new message object
     const userMessage: Message = { sender: 'user', text: prompt };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
@@ -75,7 +75,6 @@ export default function Home() {
       const data: GeneratedCode = await response.json();
       setGeneratedCode(data);
 
-      // ⭐ FIX: Explicitly type the new AI message object
       const aiMessage: Message = { sender: 'ai', text: "Here is the code for your component." };
       const finalMessages = [...newMessages, aiMessage];
       setMessages(finalMessages);
@@ -83,7 +82,6 @@ export default function Home() {
       await saveSession(finalMessages, data);
     } catch (error) {
       console.error(error);
-      // ⭐ FIX: Explicitly type the new error message object
       const errorMessage: Message = { sender: 'ai', text: "Sorry, something went wrong. Please try again." };
       const errorMessages = [...newMessages, errorMessage];
       setMessages(errorMessages);
