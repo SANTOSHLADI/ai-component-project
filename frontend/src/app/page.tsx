@@ -11,125 +11,10 @@ interface GeneratedCode { jsx: string; css: string; }
 interface Message { sender: 'user' | 'ai'; text: string; }
 interface Session { _id: string; lastUpdatedAt: string; }
 
-// --- CHILD COMPONENTS (Now properly formatted) ---
-
-function ChatPanel({ messages, onSendMessage }: { messages: Message[]; onSendMessage: (prompt: string) => void; }) {
-  const [prompt, setPrompt] = useState('');
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (prompt.trim()) {
-      onSendMessage(prompt);
-      setPrompt('');
-    }
-  };
-  return (
-    <div className="flex flex-col h-full bg-gray-800 text-white">
-      <div className="flex-1 p-4 overflow-y-auto">
-        {messages.length === 0 ? (
-          <p className="text-sm text-gray-400">Start by describing the component you want to build.</p>
-        ) : (
-          messages.map((msg, index) => (
-            <div key={index} className={`mb-3 p-2 rounded-lg ${msg.sender === 'user' ? 'bg-blue-600 self-end' : 'bg-gray-700 self-start'}`}>
-              <p className="text-sm">{msg.text}</p>
-            </div>
-          ))
-        )}
-      </div>
-      <div className="p-4 border-t border-gray-700">
-        <form onSubmit={handleFormSubmit}>
-          <input
-            type="text"
-            placeholder="e.g., a blue login button"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-900 rounded-lg focus:outline-none"
-          />
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function CodeDisplay({ code }: { code: GeneratedCode | null }) {
-  const [activeTab, setActiveTab] = useState<'jsx' | 'css'>('jsx');
-  const [copySuccess, setCopySuccess] = useState('');
-
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text).then(
-      () => {
-        setCopySuccess('Copied!');
-        setTimeout(() => setCopySuccess(''), 2000);
-      },
-      () => {
-        setCopySuccess('Failed to copy');
-        setTimeout(() => setCopySuccess(''), 2000);
-      }
-    );
-  };
-
-  const handleDownload = () => {
-    if (!code) return;
-    const zip = new JSZip();
-    const folder = zip.folder('component');
-    folder!.file('Component.jsx', code.jsx);
-    folder!.file('style.css', code.css);
-    zip.generateAsync({ type: 'blob' }).then((content) => {
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(content);
-      link.download = 'component.zip';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    });
-  };
-
-  if (!code) {
-    return (
-      <div className="bg-gray-900 text-white p-4 rounded-lg h-full flex items-center justify-center">
-        <p className="text-gray-400">Generated code will appear here.</p>
-      </div>
-    );
-  }
-
-  const currentCode = activeTab === 'jsx' ? code.jsx : code.css;
-
-  return (
-    <div className="bg-gray-900 text-white rounded-lg h-full flex flex-col">
-      <div className="flex items-center justify-between border-b border-gray-700">
-        <div className="flex">
-          <button onClick={() => setActiveTab('jsx')} className={`px-4 py-2 ${activeTab === 'jsx' ? 'bg-gray-700' : ''}`}>JSX</button>
-          <button onClick={() => setActiveTab('css')} className={`px-4 py-2 ${activeTab === 'css' ? 'bg-gray-700' : ''}`}>CSS</button>
-        </div>
-        <div className="flex items-center gap-2 pr-4">
-          {copySuccess && <span className="text-sm text-green-400">{copySuccess}</span>}
-          <button onClick={() => handleCopy(currentCode)} className="text-sm px-3 py-1 bg-gray-600 rounded hover:bg-gray-500">Copy</button>
-          <button onClick={handleDownload} className="text-sm px-3 py-1 bg-blue-600 rounded hover:bg-blue-500">Download .zip</button>
-        </div>
-      </div>
-      <pre className="text-sm p-4 overflow-y-auto flex-1">
-        <code>{currentCode}</code>
-      </pre>
-    </div>
-  );
-}
-
-function SessionManager({ sessions, onLoad, onNew, onLogout }: { sessions: Session[], onLoad: (id: string) => void, onNew: () => void, onLogout: () => void }) {
-  return (
-    <div className="p-4 bg-gray-700 text-white">
-      <h2 className="text-lg font-bold mb-2">Sessions</h2>
-      <button onClick={onNew} className="w-full mb-4 px-4 py-2 bg-green-600 rounded hover:bg-green-500 text-sm">+ New Session</button>
-      <div className="max-h-48 overflow-y-auto">
-        {sessions.map(session => (
-          <div key={session._id} onClick={() => onLoad(session._id)} className="p-2 mb-2 bg-gray-600 rounded cursor-pointer hover:bg-gray-500">
-            <p className="text-xs">Session from:</p>
-            <p className="text-sm font-semibold">{new Date(session.lastUpdatedAt).toLocaleString()}</p>
-          </div>
-        ))}
-      </div>
-      <button onClick={onLogout} className="w-full mt-4 px-4 py-2 bg-red-600 rounded hover:bg-red-500 text-sm">Logout</button>
-    </div>
-  );
-}
+// --- CHILD COMPONENTS (Unchanged) ---
+function ChatPanel({ messages, onSendMessage }: { messages: Message[]; onSendMessage: (prompt: string) => void; }) { const [prompt, setPrompt] = useState(''); const handleFormSubmit = (e: React.FormEvent) => { e.preventDefault(); if (prompt.trim()) { onSendMessage(prompt); setPrompt(''); } }; return ( <div className="flex flex-col h-full bg-gray-800 text-white"><div className="flex-1 p-4 overflow-y-auto">{messages.length === 0 ? <p className="text-sm text-gray-400">Start by describing the component you want to build.</p> : messages.map((msg, index) => (<div key={index} className={`mb-3 p-2 rounded-lg ${msg.sender === 'user' ? 'bg-blue-600 self-end' : 'bg-gray-700 self-start'}`}><p className="text-sm">{msg.text}</p></div>))}</div><div className="p-4 border-t border-gray-700"><form onSubmit={handleFormSubmit}><input type="text" placeholder="e.g., a blue login button" value={prompt} onChange={(e) => setPrompt(e.target.value)} className="w-full px-3 py-2 bg-gray-900 rounded-lg focus:outline-none" /></form></div></div> ); }
+function CodeDisplay({ code }: { code: GeneratedCode | null }) { const [activeTab, setActiveTab] = useState<'jsx' | 'css'>('jsx'); const [copySuccess, setCopySuccess] = useState(''); const handleCopy = (text: string) => { navigator.clipboard.writeText(text).then(() => { setCopySuccess('Copied!'); setTimeout(() => setCopySuccess(''), 2000); }, () => { setCopySuccess('Failed to copy'); setTimeout(() => setCopySuccess(''), 2000); }); }; const handleDownload = () => { if (!code) return; const zip = new JSZip(); const folder = zip.folder('component'); folder!.file('Component.jsx', code.jsx); folder!.file('style.css', code.css); zip.generateAsync({ type: 'blob' }).then((content) => { const link = document.createElement('a'); link.href = URL.createObjectURL(content); link.download = 'component.zip'; document.body.appendChild(link); link.click(); document.body.removeChild(link); }); }; if (!code) { return <div className="bg-gray-900 text-white p-4 rounded-lg h-full flex items-center justify-center"><p className="text-gray-400">Generated code will appear here.</p></div>; } const currentCode = activeTab === 'jsx' ? code.jsx : code.css; return ( <div className="bg-gray-900 text-white rounded-lg h-full flex flex-col"><div className="flex items-center justify-between border-b border-gray-700"><div className="flex"><button onClick={() => setActiveTab('jsx')} className={`px-4 py-2 ${activeTab === 'jsx' ? 'bg-gray-700' : ''}`}>JSX</button><button onClick={() => setActiveTab('css')} className={`px-4 py-2 ${activeTab === 'css' ? 'bg-gray-700' : ''}`}>CSS</button></div><div className="flex items-center gap-2 pr-4">{copySuccess && <span className="text-sm text-green-400">{copySuccess}</span>}<button onClick={() => handleCopy(currentCode)} className="text-sm px-3 py-1 bg-gray-600 rounded hover:bg-gray-500">Copy</button><button onClick={handleDownload} className="text-sm px-3 py-1 bg-blue-600 rounded hover:bg-blue-500">Download .zip</button></div></div><pre className="text-sm p-4 overflow-y-auto flex-1"><code>{currentCode}</code></pre></div> ); }
+function SessionManager({ sessions, onLoad, onNew, onLogout }: { sessions: Session[], onLoad: (id: string) => void, onNew: () => void, onLogout: () => void }) { return ( <div className="p-4 bg-gray-700 text-white"><h2 className="text-lg font-bold mb-2">Sessions</h2><button onClick={onNew} className="w-full mb-4 px-4 py-2 bg-green-600 rounded hover:bg-green-500 text-sm">+ New Session</button><div className="max-h-48 overflow-y-auto">{sessions.map(session => (<div key={session._id} onClick={() => onLoad(session._id)} className="p-2 mb-2 bg-gray-600 rounded cursor-pointer hover:bg-gray-500"><p className="text-xs">Session from:</p><p className="text-sm font-semibold">{new Date(session.lastUpdatedAt).toLocaleString()}</p></div>))}</div><button onClick={onLogout} className="w-full mt-4 px-4 py-2 bg-red-600 rounded hover:bg-red-500 text-sm">Logout</button></div> ); }
 
 // --- MAIN PAGE COMPONENT ---
 export default function Home() {
@@ -175,7 +60,9 @@ export default function Home() {
 
   const handleSendMessage = async (prompt: string) => {
     setIsLoading(true);
-    const newMessages: Message[] = [...messages, { sender: 'user', text: prompt }];
+    // ⭐ FIX: Explicitly type the new message object
+    const userMessage: Message = { sender: 'user', text: prompt };
+    const newMessages = [...messages, userMessage];
     setMessages(newMessages);
 
     try {
@@ -187,12 +74,18 @@ export default function Home() {
       if (!response.ok) throw new Error('Failed to fetch from the API');
       const data: GeneratedCode = await response.json();
       setGeneratedCode(data);
-      const finalMessages = [...newMessages, { sender: 'ai', text: "Here is the code for your component." }];
+
+      // ⭐ FIX: Explicitly type the new AI message object
+      const aiMessage: Message = { sender: 'ai', text: "Here is the code for your component." };
+      const finalMessages = [...newMessages, aiMessage];
       setMessages(finalMessages);
+      
       await saveSession(finalMessages, data);
     } catch (error) {
       console.error(error);
-      const errorMessages = [...newMessages, { sender: 'ai', text: "Sorry, something went wrong. Please try again." }];
+      // ⭐ FIX: Explicitly type the new error message object
+      const errorMessage: Message = { sender: 'ai', text: "Sorry, something went wrong. Please try again." };
+      const errorMessages = [...newMessages, errorMessage];
       setMessages(errorMessages);
     } finally {
       setIsLoading(false);

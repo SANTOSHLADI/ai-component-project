@@ -28,13 +28,15 @@ app.post('/api/auth/login', async (req, res) => { try { const { email, password 
 app.post('/api/generate/component', async (req, res) => {
   const { prompt, currentJsx, currentCss } = req.body;
 
+  // ⭐ THIS PROMPT IS THE FINAL, MOST ROBUST VERSION
   const systemPrompt = `
-    You are an expert React and CSS developer. A user will provide you with a prompt and optionally, some existing JSX and CSS code for a component.
-    Your task is to return a raw JSON object with "jsx" and "css" keys.
-    - If the user provides a prompt to create a NEW component (e.g., "create a login form"), generate the component from scratch.
-    - If the user provides existing JSX and CSS and a prompt to MODIFY it (e.g., "make the button red"), you MUST modify the existing code. Do not regenerate it from scratch.
-    - The "jsx" value must be a string of complete code for a single React functional component, including imports and a default export.
-    - The "css" value must be a string of all necessary CSS.
+    You are an expert React and CSS developer. Your task is to return a raw JSON object with "jsx" and "css" keys.
+    - The "jsx" value must be a string of complete, valid JSX code for a single React functional component.
+    - CRITICAL: The response MUST be a React component. For a simple prompt like "hello world", you must create a component that displays "hello world", for example: \`import React from 'react'; const HelloWorld = () => <div>Hello, World!</div>; export default HelloWorld;\`.
+    - CRITICAL: All import statements must be on separate lines.
+    - CRITICAL: You MUST use standard CSS with classNames. Do NOT use styled-components, emotion, or any other CSS-in-JS libraries or inline style objects. All CSS must be returned in the "css" field.
+    - The "css" value must be a string of all necessary CSS that corresponds to the classNames used in the JSX.
+    - If the user provides existing JSX and CSS to modify, you MUST modify the existing code, not regenerate it.
     - Ensure your entire response is only the raw JSON object. Do not include any other text or markdown.
   `;
   
@@ -49,7 +51,6 @@ app.post('/api/generate/component', async (req, res) => {
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        // ⭐ CHANGED THE MODEL TO A DIFFERENT ONE FOR RELIABILITY
         model: "mistralai/mistral-7b-instruct-v0.2",
         messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
         response_format: { type: "json_object" },
@@ -60,11 +61,7 @@ app.post('/api/generate/component', async (req, res) => {
       }
     );
 
-    console.log("--- RAW AI RESPONSE ---");
-    console.log(JSON.stringify(response.data, null, 2));
-    console.log("-----------------------");
-
-    if (response.data && response.data.choices && response.data.choices[0].message.content) {
+    if (response.data?.choices?.[0]?.message?.content) {
       const jsonResponseString = response.data.choices[0].message.content;
       const generatedCode = JSON.parse(jsonResponseString);
       res.status(200).json(generatedCode);
@@ -73,12 +70,7 @@ app.post('/api/generate/component', async (req, res) => {
     }
 
   } catch (error) {
-    console.error("Error calling AI API or parsing response:");
-    if (error.response) {
-      console.error("Axios Error Data:", JSON.stringify(error.response.data, null, 2));
-    } else {
-      console.error(error.message);
-    }
+    console.error("Error calling AI API or parsing response:", error.message);
     res.status(500).json({ message: "Failed to generate component from AI." });
   }
 });
